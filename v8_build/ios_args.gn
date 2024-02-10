@@ -27,7 +27,7 @@ v8_enable_maglev= true
 v8_enable_v8_checks= false
 v8_enable_turbofan=true
 v8_enable_webassembly= true
-v8_jitless = false
+v8_jitless = true
 v8_optimized_debug= true
 v8_promise_internal_field_count= true
 

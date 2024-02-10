@@ -533,7 +533,7 @@ if __name__ == "__main__":
     build_parser.add_argument('--target-arch', default="arm64", dest="target_arch", choices=["x86_64", "arm64"], help="Target architecture.")
     build_parser.add_argument("--node-root-dir", dest="node_root_dir", default="build/nodejs", help="Nodejs source root directory")
     build_parser.add_argument('--build-stage', dest='build_stage', required=False, choices=["host-configure", "host-build", "target-configure", "target-build", "install"], help="Only do the specified build stage")
-    build_parser.add_argument('--parallel', default=max(1, round(os.cpu_count()/4*3)), help='Parallel job numbers of make command, default is 1/2 of CPU cores including hyperthreading')
+    build_parser.add_argument('--parallel', default=max(1, round(os.cpu_count()/4.0*3)), help='Parallel job numbers of make command, default is 3/4 of CPU cores including hyperthreading')
     build_parser.add_argument('--use-ccache', default=True, action='store_true', help='Whether to use ccache')
     build_parser.add_argument('--prefix', help='Prefix of install directory')
 
