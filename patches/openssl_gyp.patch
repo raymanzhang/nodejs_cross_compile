@@ -1,0 +1,450 @@
+diff --git a/deps/openssl/openssl-cl_asm.gypi b/deps/openssl/openssl-cl_asm.gypi
+index cd10355c17..d37b9f29fa 100644
+--- a/deps/openssl/openssl-cl_asm.gypi
++++ b/deps/openssl/openssl-cl_asm.gypi
+@@ -6,15 +6,15 @@
+       'includes': ['config/archs/linux-ppc64le/asm/openssl-cl.gypi'],
+     }, 'target_arch=="s390x" and OS=="linux"', {
+       'includes': ['config/archs/linux64-s390x/asm/openssl-cl.gypi'],
+-    }, 'target_arch=="arm" and OS=="linux"', {
++    }, 'target_arch=="arm" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-armv4/asm/openssl-cl.gypi'],
+-    }, 'target_arch=="arm64" and OS=="linux"', {
++    }, 'target_arch=="arm64" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-aarch64/asm/openssl-cl.gypi'],
+     }, 'target_arch=="ia32" and OS=="freebsd"', {
+       'includes': ['config/archs/BSD-x86/asm/openssl-cl.gypi'],
+-    }, 'target_arch=="ia32" and OS=="linux"', {
++    }, 'target_arch=="ia32" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-elf/asm/openssl-cl.gypi'],
+-    }, 'target_arch=="ia32" and OS=="mac"', {
++    }, 'target_arch=="ia32" and OS in ("mac", "ios")', {
+       'includes': ['config/archs/darwin-i386-cc/asm/openssl-cl.gypi'],
+     }, 'target_arch=="ia32" and OS=="solaris"', {
+       'includes': ['config/archs/solaris-x86-gcc/asm/openssl-cl.gypi'],
+@@ -25,17 +25,17 @@
+       'includes': ['config/archs/linux-elf/asm/openssl-cl.gypi'],
+     }, 'target_arch=="x64" and OS=="freebsd"', {
+       'includes': ['config/archs/BSD-x86_64/asm/openssl-cl.gypi'],
+-    }, 'target_arch=="x64" and OS=="mac"', {
++    }, 'target_arch=="x64" and OS in ("mac", "ios")', {
+       'includes': ['config/archs/darwin64-x86_64-cc/asm/openssl-cl.gypi'],
+-    }, 'target_arch=="arm64" and OS=="mac"', {
++    }, 'target_arch=="arm64" and OS in ("mac", "ios")', {
+       'includes': ['config/archs/darwin64-arm64-cc/asm/openssl-cl.gypi'],
+     }, 'target_arch=="x64" and OS=="solaris"', {
+       'includes': ['config/archs/solaris64-x86_64-gcc/asm/openssl-cl.gypi'],
+     }, 'target_arch=="x64" and OS=="win"', {
+       'includes': ['config/archs/VC-WIN64A/asm/openssl-cl.gypi'],
+-    }, 'target_arch=="x64" and OS=="linux"', {
++    }, 'target_arch=="x64" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-x86_64/asm/openssl-cl.gypi'],
+-    }, 'target_arch=="mips64el" and OS=="linux"', {
++    }, 'target_arch=="mips64el" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux64-mips64/asm/openssl-cl.gypi'],
+     },{
+       # Other architectures don't use assembly
+diff --git a/deps/openssl/openssl-cl_asm_avx2.gypi b/deps/openssl/openssl-cl_asm_avx2.gypi
+index 50b5a9c375..c21edf1677 100644
+--- a/deps/openssl/openssl-cl_asm_avx2.gypi
++++ b/deps/openssl/openssl-cl_asm_avx2.gypi
+@@ -6,15 +6,15 @@
+       'includes': ['config/archs/linux-ppc64le/asm_avx2/openssl-cl.gypi'],
+     }, 'target_arch=="s390x" and OS=="linux"', {
+       'includes': ['config/archs/linux64-s390x/asm_avx2/openssl-cl.gypi'],
+-    }, 'target_arch=="arm" and OS=="linux"', {
++    }, 'target_arch=="arm" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-armv4/asm_avx2/openssl-cl.gypi'],
+-    }, 'target_arch=="arm64" and OS=="linux"', {
++    }, 'target_arch=="arm64" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-aarch64/asm_avx2/openssl-cl.gypi'],
+     }, 'target_arch=="ia32" and OS=="freebsd"', {
+       'includes': ['config/archs/BSD-x86/asm_avx2/openssl-cl.gypi'],
+-    }, 'target_arch=="ia32" and OS=="linux"', {
++    }, 'target_arch=="ia32" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-elf/asm_avx2/openssl-cl.gypi'],
+-    }, 'target_arch=="ia32" and OS=="mac"', {
++    }, 'target_arch=="ia32" and OS in ("mac", "ios")', {
+       'includes': ['config/archs/darwin-i386-cc/asm_avx2/openssl-cl.gypi'],
+     }, 'target_arch=="ia32" and OS=="solaris"', {
+       'includes': ['config/archs/solaris-x86-gcc/asm_avx2/openssl-cl.gypi'],
+@@ -25,15 +25,15 @@
+       'includes': ['config/archs/linux-elf/asm_avx2/openssl-cl.gypi'],
+     }, 'target_arch=="x64" and OS=="freebsd"', {
+       'includes': ['config/archs/BSD-x86_64/asm_avx2/openssl-cl.gypi'],
+-    }, 'target_arch=="x64" and OS=="mac"', {
++    }, 'target_arch=="x64" and OS in ("mac", "ios")', {
+       'includes': ['config/archs/darwin64-x86_64-cc/asm_avx2/openssl-cl.gypi'],
+-    }, 'target_arch=="arm64" and OS=="mac"', {
++    }, 'target_arch=="arm64" and OS in ("mac", "ios")', {
+       'includes': ['config/archs/darwin64-arm64-cc/asm_avx2/openssl-cl.gypi'],
+     }, 'target_arch=="x64" and OS=="solaris"', {
+       'includes': ['config/archs/solaris64-x86_64-gcc/asm_avx2/openssl-cl.gypi'],
+     }, 'target_arch=="x64" and OS=="win"', {
+       'includes': ['config/archs/VC-WIN64A/asm_avx2/openssl-cl.gypi'],
+-    }, 'target_arch=="x64" and OS=="linux"', {
++    }, 'target_arch=="x64" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-x86_64/asm_avx2/openssl-cl.gypi'],
+     }, {
+       # Other architectures don't use assembly
+diff --git a/deps/openssl/openssl-cl_no_asm.gypi b/deps/openssl/openssl-cl_no_asm.gypi
+index 0964fb3673..36b0ef8725 100644
+--- a/deps/openssl/openssl-cl_no_asm.gypi
++++ b/deps/openssl/openssl-cl_no_asm.gypi
+@@ -14,9 +14,9 @@
+       'includes': ['config/archs/VC-WIN64-ARM/no-asm/openssl-cl.gypi'],
+     }, 'target_arch=="ia32" and OS=="freebsd"', {
+       'includes': ['config/archs/BSD-x86/no-asm/openssl-cl.gypi'],
+-    }, 'target_arch=="ia32" and OS=="linux"', {
++    }, 'target_arch=="ia32" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-elf/no-asm/openssl-cl.gypi'],
+-    }, 'target_arch=="ia32" and OS=="mac"', {
++    }, 'target_arch=="ia32" and OS in ("mac", "ios")', {
+       'includes': ['config/archs/darwin-i386-cc/no-asm/openssl-cl.gypi'],
+     }, 'target_arch=="ia32" and OS=="solaris"', {
+       'includes': ['config/archs/solaris-x86-gcc/no-asm/openssl-cl.gypi'],
+@@ -27,21 +27,21 @@
+       'includes': ['config/archs/linux-elf/no-asm/openssl-cl.gypi'],
+     }, 'target_arch=="x64" and OS=="freebsd"', {
+       'includes': ['config/archs/BSD-x86_64/no-asm/openssl-cl.gypi'],
+-    }, 'target_arch=="x64" and OS=="mac"', {
++    }, 'target_arch=="x64" and OS in ("mac", "ios")', {
+       'includes': ['config/archs/darwin64-x86_64-cc/no-asm/openssl-cl.gypi'],
+-    }, 'target_arch=="arm64" and OS=="mac"', {
++    }, 'target_arch=="arm64" and OS in ("mac", "ios")', {
+       'includes': ['config/archs/darwin64-arm64-cc/no-asm/openssl-cl.gypi'],
+     }, 'target_arch=="x64" and OS=="solaris"', {
+       'includes': ['config/archs/solaris64-x86_64-gcc/no-asm/openssl-cl.gypi'],
+     }, 'target_arch=="x64" and OS=="win"', {
+       'includes': ['config/archs/VC-WIN64A/no-asm/openssl-cl.gypi'],
+-    }, 'target_arch=="x64" and OS=="linux"', {
++    }, 'target_arch=="x64" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-x86_64/no-asm/openssl-cl.gypi'],
+-    }, 'target_arch=="mips64el" and OS=="linux"', {
++    }, 'target_arch=="mips64el" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux64-mips64/no-asm/openssl-cl.gypi'],
+-    }, 'target_arch=="riscv64" and OS=="linux"', {
++    }, 'target_arch=="riscv64" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux64-riscv64/no-asm/openssl-cl.gypi'],
+-    }, 'target_arch=="loong64" and OS=="linux"', {
++    }, 'target_arch=="loong64" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux64-loongarch64/no-asm/openssl-cl.gypi'],
+     }, {
+       # Other architectures don't use assembly
+diff --git a/deps/openssl/openssl-cli.gypi b/deps/openssl/openssl-cli.gypi
+index b4c278b4fe..412eccb7c2 100644
+--- a/deps/openssl/openssl-cli.gypi
++++ b/deps/openssl/openssl-cli.gypi
+@@ -14,7 +14,7 @@
+       'link_settings': {
+         'libraries': ['<@(openssl_cli_libraries_win)'],
+       },
+-    }, 'OS in "linux android"', {
++    }, 'OS in ("linux", "android")', {
+       'link_settings': {
+         'libraries': [
+           '-ldl',
+diff --git a/deps/openssl/openssl-fips_asm.gypi b/deps/openssl/openssl-fips_asm.gypi
+index 631df9eb89..f67613fd95 100644
+--- a/deps/openssl/openssl-fips_asm.gypi
++++ b/deps/openssl/openssl-fips_asm.gypi
+@@ -6,17 +6,17 @@
+       'includes': ['config/archs/linux-ppc64le/asm/openssl-fips.gypi'],
+     }, 'target_arch=="s390x" and OS=="linux"', {
+       'includes': ['config/archs/linux64-s390x/asm/openssl-fips.gypi'],
+-    }, 'target_arch=="arm" and OS=="linux"', {
++    }, 'target_arch=="arm" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-armv4/asm/openssl-fips.gypi'],
+-    }, 'target_arch=="arm64" and OS=="linux"', {
++    }, 'target_arch=="arm64" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-aarch64/asm/openssl-fips.gypi'],
+-    }, 'target_arch=="arm64" and OS=="mac"', {
++    }, 'target_arch=="arm64" and OS in ("mac", "ios")', {
+       'includes': ['config/archs/darwin64-arm64-cc/asm/openssl-fips.gypi'],
+     }, 'target_arch=="ia32" and OS=="freebsd"', {
+       'includes': ['config/archs/BSD-x86/asm/openssl-fips.gypi'],
+-    }, 'target_arch=="ia32" and OS=="linux"', {
++    }, 'target_arch=="ia32" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-elf/asm/openssl-fips.gypi'],
+-    }, 'target_arch=="ia32" and OS=="mac"', {
++    }, 'target_arch=="ia32" and OS in ("mac", "ios")', {
+       'includes': ['config/archs/darwin-i386-cc/asm/openssl-fips.gypi'],
+     }, 'target_arch=="ia32" and OS=="solaris"', {
+       'includes': ['config/archs/solaris-x86-gcc/asm/openssl-fips.gypi'],
+@@ -42,7 +42,7 @@
+       'includes': ['config/archs/linux-elf/asm/openssl-fips.gypi'],
+     }, 'target_arch=="x64" and OS=="freebsd"', {
+       'includes': ['config/archs/BSD-x86_64/asm/openssl-fips.gypi'],
+-    }, 'target_arch=="x64" and OS=="mac"', {
++    }, 'target_arch=="x64" and OS in ("mac", "ios")', {
+       'includes': ['config/archs/darwin64-x86_64-cc/asm/openssl-fips.gypi'],
+     }, 'target_arch=="x64" and OS=="solaris"', {
+       'includes': ['config/archs/solaris64-x86_64-gcc/asm/openssl-fips.gypi'],
+@@ -67,9 +67,9 @@
+           ],
+         }
+       ],
+-    }, 'target_arch=="x64" and OS=="linux"', {
++    }, 'target_arch=="x64" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-x86_64/asm/openssl-fips.gypi'],
+-    }, 'target_arch=="mips64el" and OS=="linux"', {
++    }, 'target_arch=="mips64el" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux64-mips64/asm/openssl-fips.gypi'],
+     }, {
+       # Other architectures don't use assembly
+diff --git a/deps/openssl/openssl-fips_asm_avx2.gypi b/deps/openssl/openssl-fips_asm_avx2.gypi
+index 4d63cacf29..b67438be94 100644
+--- a/deps/openssl/openssl-fips_asm_avx2.gypi
++++ b/deps/openssl/openssl-fips_asm_avx2.gypi
+@@ -6,15 +6,15 @@
+       'includes': ['config/archs/linux-ppc64le/asm_avx2/openssl-fips.gypi'],
+     }, 'target_arch=="s390x" and OS=="linux"', {
+       'includes': ['config/archs/linux64-s390x/asm_avx2/openssl-fips.gypi'],
+-    }, 'target_arch=="arm" and OS=="linux"', {
++    }, 'target_arch=="arm" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-armv4/asm_avx2/openssl-fips.gypi'],
+-    }, 'target_arch=="arm64" and OS=="linux"', {
++    }, 'target_arch=="arm64" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-aarch64/asm_avx2/openssl-fips.gypi'],
+     }, 'target_arch=="ia32" and OS=="freebsd"', {
+       'includes': ['config/archs/BSD-x86/asm_avx2/openssl-fips.gypi'],
+-    }, 'target_arch=="ia32" and OS=="linux"', {
++    }, 'target_arch=="ia32" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-elf/asm_avx2/openssl-fips.gypi'],
+-    }, 'target_arch=="ia32" and OS=="mac"', {
++    }, 'target_arch=="ia32" and OS in ("mac", "ios")', {
+       'includes': ['config/archs/darwin-i386-cc/asm_avx2/openssl-fips.gypi'],
+     }, 'target_arch=="ia32" and OS=="solaris"', {
+       'includes': ['config/archs/solaris-x86-gcc/asm_avx2/openssl-fips.gypi'],
+@@ -40,9 +40,9 @@
+       'includes': ['config/archs/linux-elf/asm_avx2/openssl-fips.gypi'],
+     }, 'target_arch=="x64" and OS=="freebsd"', {
+       'includes': ['config/archs/BSD-x86_64/asm_avx2/openssl-fips.gypi'],
+-    }, 'target_arch=="x64" and OS=="mac"', {
++    }, 'target_arch=="x64" and OS in ("mac", "ios")', {
+       'includes': ['config/archs/darwin64-x86_64-cc/asm_avx2/openssl-fips.gypi'],
+-    }, 'target_arch=="arm64" and OS=="mac"', {
++    }, 'target_arch=="arm64" and OS in ("mac", "ios")', {
+       'includes': ['config/archs/darwin64-arm64-cc/asm_avx2/openssl-fips.gypi'],
+     }, 'target_arch=="x64" and OS=="solaris"', {
+       'includes': ['config/archs/solaris64-x86_64-gcc/asm_avx2/openssl-fips.gypi'],
+@@ -67,7 +67,7 @@
+           ],
+         }
+       ],
+-    }, 'target_arch=="x64" and OS=="linux"', {
++    }, 'target_arch=="x64" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-x86_64/asm_avx2/openssl-fips.gypi'],
+     }, {
+       # Other architectures don't use assembly
+diff --git a/deps/openssl/openssl-fips_no_asm.gypi b/deps/openssl/openssl-fips_no_asm.gypi
+index 7fdfd772ab..a4b382dd38 100644
+--- a/deps/openssl/openssl-fips_no_asm.gypi
++++ b/deps/openssl/openssl-fips_no_asm.gypi
+@@ -13,9 +13,9 @@
+       'includes': ['config/archs/linux-aarch64/no-asm/openssl-fips.gypi'],
+     }, 'target_arch=="ia32" and OS=="freebsd"', {
+       'includes': ['config/archs/BSD-x86/no-asm/openssl-fips.gypi'],
+-    }, 'target_arch=="ia32" and OS=="linux"', {
++    }, 'target_arch=="ia32" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-elf/no-asm/openssl-fips.gypi'],
+-    }, 'target_arch=="ia32" and OS=="mac"', {
++    }, 'target_arch=="ia32" and OS in ("mac", "ios")', {
+       'includes': ['config/archs/darwin-i386-cc/no-asm/openssl-fips.gypi'],
+     }, 'target_arch=="ia32" and OS=="solaris"', {
+       'includes': ['config/archs/solaris-x86-gcc/no-asm/openssl-fips.gypi'],
+@@ -26,9 +26,9 @@
+       'includes': ['config/archs/linux-elf/no-asm/openssl-fips.gypi'],
+     }, 'target_arch=="x64" and OS=="freebsd"', {
+       'includes': ['config/archs/BSD-x86_64/no-asm/openssl-fips.gypi'],
+-    }, 'target_arch=="x64" and OS=="mac"', {
++    }, 'target_arch=="x64" and OS in ("mac", "ios")', {
+       'includes': ['config/archs/darwin64-x86_64-cc/no-asm/openssl-fips.gypi'],
+-    }, 'target_arch=="arm64" and OS=="mac"', {
++    }, 'target_arch=="arm64" and OS in ("mac", "ios")', {
+       'includes': ['config/archs/darwin64-arm64-cc/no-asm/openssl-fips.gypi'],
+     }, 'target_arch=="x64" and OS=="solaris"', {
+       'includes': ['config/archs/solaris64-x86_64-gcc/no-asm/openssl-fips.gypi'],
+@@ -36,13 +36,13 @@
+       'includes': ['config/archs/VC-WIN64A/no-asm/openssl-fips.gypi'],
+     }, 'target_arch=="arm64" and OS=="win"', {
+       'includes': ['config/archs/VC-WIN64-ARM/no-asm/openssl-fips.gypi'],
+-    }, 'target_arch=="x64" and OS=="linux"', {
++    }, 'target_arch=="x64" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-x86_64/no-asm/openssl-fips.gypi'],
+-    }, 'target_arch=="mips64el" and OS=="linux"', {
++    }, 'target_arch=="mips64el" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux64-mips64/no-asm/openssl-fips.gypi'],
+-    }, 'target_arch=="riscv64" and OS=="linux"', {
++    }, 'target_arch=="riscv64" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux64-riscv64/no-asm/openssl-fips.gypi'],
+-    }, 'target_arch=="loong64" and OS=="linux"', {
++    }, 'target_arch=="loong64" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux64-loongarch64/no-asm/openssl-fips.gypi'],
+     }, {
+       # Other architectures don't use assembly
+diff --git a/deps/openssl/openssl.gyp b/deps/openssl/openssl.gyp
+index f6b157f8d6..4e1fb95b0a 100644
+--- a/deps/openssl/openssl.gyp
++++ b/deps/openssl/openssl.gyp
+@@ -15,7 +15,7 @@
+         'obj_dir_abs%': '<(PRODUCT_DIR_ABS)/obj.target',
+         'modules_dir': '<(PRODUCT_DIR_ABS)/obj.target/deps/openssl/lib/openssl-modules',
+       }],
+-      ['OS=="mac"', {
++      ['OS in ("mac", "ios")', {
+         'obj_dir_abs%': '<(PRODUCT_DIR_ABS)/obj.target',
+         'modules_dir': '<(PRODUCT_DIR_ABS)/obj.target/deps/openssl/lib/openssl-modules',
+       }],
+diff --git a/deps/openssl/openssl_asm.gypi b/deps/openssl/openssl_asm.gypi
+index dd7e636eb0..b06d680a4f 100644
+--- a/deps/openssl/openssl_asm.gypi
++++ b/deps/openssl/openssl_asm.gypi
+@@ -6,17 +6,17 @@
+       'includes': ['config/archs/linux-ppc64le/asm/openssl.gypi'],
+     }, 'target_arch=="s390x" and OS=="linux"', {
+       'includes': ['config/archs/linux64-s390x/asm/openssl.gypi'],
+-    }, 'target_arch=="arm" and OS=="linux"', {
++    }, 'target_arch=="arm" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-armv4/asm/openssl.gypi'],
+-    }, 'target_arch=="arm64" and OS=="linux"', {
++    }, 'target_arch=="arm64" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-aarch64/asm/openssl.gypi'],
+-    }, 'target_arch=="arm64" and OS=="mac"', {
++    }, 'target_arch=="arm64" and OS in ("mac", "ios")', {
+       'includes': ['config/archs/darwin64-arm64-cc/asm/openssl.gypi'],
+     }, 'target_arch=="ia32" and OS=="freebsd"', {
+       'includes': ['config/archs/BSD-x86/asm/openssl.gypi'],
+-    }, 'target_arch=="ia32" and OS=="linux"', {
++    }, 'target_arch=="ia32" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-elf/asm/openssl.gypi'],
+-    }, 'target_arch=="ia32" and OS=="mac"', {
++    }, 'target_arch=="ia32" and OS in ("mac", "ios")', {
+       'includes': ['config/archs/darwin-i386-cc/asm/openssl.gypi'],
+     }, 'target_arch=="ia32" and OS=="solaris"', {
+       'includes': ['config/archs/solaris-x86-gcc/asm/openssl.gypi'],
+@@ -42,7 +42,7 @@
+       'includes': ['config/archs/linux-elf/asm/openssl.gypi'],
+     }, 'target_arch=="x64" and OS=="freebsd"', {
+       'includes': ['config/archs/BSD-x86_64/asm/openssl.gypi'],
+-    }, 'target_arch=="x64" and OS=="mac"', {
++    }, 'target_arch=="x64" and OS in ("mac", "ios")', {
+       'includes': ['config/archs/darwin64-x86_64-cc/asm/openssl.gypi'],
+     }, 'target_arch=="x64" and OS=="solaris"', {
+       'includes': ['config/archs/solaris64-x86_64-gcc/asm/openssl.gypi'],
+@@ -67,9 +67,9 @@
+           ],
+         }
+       ],
+-    }, 'target_arch=="x64" and OS=="linux"', {
++    }, 'target_arch=="x64" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-x86_64/asm/openssl.gypi'],
+-    }, 'target_arch=="mips64el" and OS=="linux"', {
++    }, 'target_arch=="mips64el" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux64-mips64/asm/openssl.gypi'],
+     }, {
+       # Other architectures don't use assembly
+diff --git a/deps/openssl/openssl_asm_avx2.gypi b/deps/openssl/openssl_asm_avx2.gypi
+index 6a9c56d76a..be8a090833 100644
+--- a/deps/openssl/openssl_asm_avx2.gypi
++++ b/deps/openssl/openssl_asm_avx2.gypi
+@@ -6,15 +6,15 @@
+       'includes': ['config/archs/linux-ppc64le/asm_avx2/openssl.gypi'],
+     }, 'target_arch=="s390x" and OS=="linux"', {
+       'includes': ['config/archs/linux64-s390x/asm_avx2/openssl.gypi'],
+-    }, 'target_arch=="arm" and OS=="linux"', {
++    }, 'target_arch=="arm" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-armv4/asm_avx2/openssl.gypi'],
+-    }, 'target_arch=="arm64" and OS=="linux"', {
++    }, 'target_arch=="arm64" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-aarch64/asm_avx2/openssl.gypi'],
+     }, 'target_arch=="ia32" and OS=="freebsd"', {
+       'includes': ['config/archs/BSD-x86/asm_avx2/openssl.gypi'],
+-    }, 'target_arch=="ia32" and OS=="linux"', {
++    }, 'target_arch=="ia32" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-elf/asm_avx2/openssl.gypi'],
+-    }, 'target_arch=="ia32" and OS=="mac"', {
++    }, 'target_arch=="ia32" and OS in ("mac", "ios")', {
+       'includes': ['config/archs/darwin-i386-cc/asm_avx2/openssl.gypi'],
+     }, 'target_arch=="ia32" and OS=="solaris"', {
+       'includes': ['config/archs/solaris-x86-gcc/asm_avx2/openssl.gypi'],
+@@ -40,9 +40,9 @@
+       'includes': ['config/archs/linux-elf/asm_avx2/openssl.gypi'],
+     }, 'target_arch=="x64" and OS=="freebsd"', {
+       'includes': ['config/archs/BSD-x86_64/asm_avx2/openssl.gypi'],
+-    }, 'target_arch=="x64" and OS=="mac"', {
++    }, 'target_arch=="x64" and OS in ("mac", "ios")', {
+       'includes': ['config/archs/darwin64-x86_64-cc/asm_avx2/openssl.gypi'],
+-    }, 'target_arch=="arm64" and OS=="mac"', {
++    }, 'target_arch=="arm64" and OS in ("mac", "ios")', {
+       'includes': ['config/archs/darwin64-arm64-cc/asm_avx2/openssl.gypi'],
+     }, 'target_arch=="x64" and OS=="solaris"', {
+       'includes': ['config/archs/solaris64-x86_64-gcc/asm_avx2/openssl.gypi'],
+@@ -67,7 +67,7 @@
+           ],
+         }
+       ],
+-    }, 'target_arch=="x64" and OS=="linux"', {
++    }, 'target_arch=="x64" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-x86_64/asm_avx2/openssl.gypi'],
+     }, {
+       # Other architectures don't use assembly
+diff --git a/deps/openssl/openssl_common.gypi b/deps/openssl/openssl_common.gypi
+index 8745ec130a..57380b01ed 100644
+--- a/deps/openssl/openssl_common.gypi
++++ b/deps/openssl/openssl_common.gypi
+@@ -44,7 +44,7 @@
+           '-luser32.lib',
+         ],
+       },
+-    }, 'OS=="mac"', {
++    }, 'OS in ("mac", "ios")', {
+       'xcode_settings': {
+         'WARNING_CFLAGS': ['-Wno-missing-field-initializers']
+       },
+diff --git a/deps/openssl/openssl_no_asm.gypi b/deps/openssl/openssl_no_asm.gypi
+index 20663decab..a2da821665 100644
+--- a/deps/openssl/openssl_no_asm.gypi
++++ b/deps/openssl/openssl_no_asm.gypi
+@@ -13,9 +13,9 @@
+       'includes': ['config/archs/linux-aarch64/no-asm/openssl.gypi'],
+     }, 'target_arch=="ia32" and OS=="freebsd"', {
+       'includes': ['config/archs/BSD-x86/no-asm/openssl.gypi'],
+-    }, 'target_arch=="ia32" and OS=="linux"', {
++    }, 'target_arch=="ia32" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-elf/no-asm/openssl.gypi'],
+-    }, 'target_arch=="ia32" and OS=="mac"', {
++    }, 'target_arch=="ia32" and OS in ("mac", "ios")', {
+       'includes': ['config/archs/darwin-i386-cc/no-asm/openssl.gypi'],
+     }, 'target_arch=="ia32" and OS=="solaris"', {
+       'includes': ['config/archs/solaris-x86-gcc/no-asm/openssl.gypi'],
+@@ -26,9 +26,9 @@
+       'includes': ['config/archs/linux-elf/no-asm/openssl.gypi'],
+     }, 'target_arch=="x64" and OS=="freebsd"', {
+       'includes': ['config/archs/BSD-x86_64/no-asm/openssl.gypi'],
+-    }, 'target_arch=="x64" and OS=="mac"', {
++    }, 'target_arch=="x64" and OS in ("mac", "ios")', {
+       'includes': ['config/archs/darwin64-x86_64-cc/no-asm/openssl.gypi'],
+-    }, 'target_arch=="arm64" and OS=="mac"', {
++    }, 'target_arch=="arm64" and OS in ("mac", "ios")', {
+       'includes': ['config/archs/darwin64-arm64-cc/no-asm/openssl.gypi'],
+     }, 'target_arch=="x64" and OS=="solaris"', {
+       'includes': ['config/archs/solaris64-x86_64-gcc/no-asm/openssl.gypi'],
+@@ -36,13 +36,13 @@
+       'includes': ['config/archs/VC-WIN64A/no-asm/openssl.gypi'],
+     }, 'target_arch=="arm64" and OS=="win"', {
+       'includes': ['config/archs/VC-WIN64-ARM/no-asm/openssl.gypi'],
+-    }, 'target_arch=="x64" and OS=="linux"', {
++    }, 'target_arch=="x64" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux-x86_64/no-asm/openssl.gypi'],
+-    }, 'target_arch=="mips64el" and OS=="linux"', {
++    }, 'target_arch=="mips64el" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux64-mips64/no-asm/openssl.gypi'],
+-    }, 'target_arch=="riscv64" and OS=="linux"', {
++    }, 'target_arch=="riscv64" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux64-riscv64/no-asm/openssl.gypi'],
+-    }, 'target_arch=="loong64" and OS=="linux"', {
++    }, 'target_arch=="loong64" and OS in ("linux", "android")', {
+       'includes': ['config/archs/linux64-loongarch64/no-asm/openssl.gypi'],
+     }, {
+       # Other architectures don't use assembly

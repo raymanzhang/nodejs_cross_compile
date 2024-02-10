@@ -1,0 +1,521 @@
+diff --git a/common.gypi b/common.gypi
+index b8c5cf1da7..d88828df65 100644
+--- a/common.gypi
++++ b/common.gypi
+@@ -88,27 +88,42 @@
+ 
+     ##### end V8 defaults #####
+ 
++    # Variables for V8's build system.
++    'v8_root_dir': 'deps/v8',
++    'v8_include_dir': '<(v8_root_dir)/include',
++    'obj_dir': '<(PRODUCT_DIR)/obj.target',
++    'v8_obj_dir': '<(obj_dir)/tools/v8_gypfiles',
++    'v8_libs': '',
++    'v8_base': '<(v8_obj_dir)/libv8_snapshot.a',
++    'v8_base_without_compiler': '<(v8_obj_dir)/<(STATIC_LIB_PREFIX)v8_base_without_compiler<(STATIC_LIB_SUFFIX)',
++#    'v8_base_without_compiler%': '<(v8_obj_dir)/libv8_base_without_compiler.a <(v8_obj_dir)/libv8_libplatform.a <(v8_obj_dir)/libv8_libbase.a <(v8_obj_dir)/libcppgc_base.a <(v8_obj_dir)/libtorque_generated_definitions.a <(v8_obj_dir)/libv8_heap_base.a <(v8_obj_dir)/libv8_bigint.a',
++#    'v8_base_without_compiler%': '<(v8_obj_dir)/libv8_monolith.a',
+     'conditions': [
++      ['node_use_bundled_v8==0', {
++        # 'v8_libs': '<(v8_obj_dir)/libv8_monolith.a',
++        'v8_base': '<(v8_libs)',
++        'v8_base_without_compiler': '<(v8_obj_dir)/libv8_monolith.a',
++      }],
+       ['OS == "win"', {
+         'os_posix': 0,
+         'v8_postmortem_support%': 0,
+-        'obj_dir': '<(PRODUCT_DIR)/obj',
+-        'v8_base': '<(PRODUCT_DIR)/lib/libv8_snapshot.a',
++        'obj_dir%': '<(PRODUCT_DIR)/obj',
+       }, {
+         'os_posix': 1,
+         'v8_postmortem_support%': 1,
+       }],
+       ['GENERATOR == "ninja"', {
+-        'obj_dir': '<(PRODUCT_DIR)/obj',
+-        'v8_base': '<(PRODUCT_DIR)/obj/tools/v8_gypfiles/libv8_snapshot.a',
++        'obj_dir%': '<(PRODUCT_DIR)/obj',
+       }, {
+         'obj_dir%': '<(PRODUCT_DIR)/obj.target',
+-        'v8_base': '<(PRODUCT_DIR)/obj.target/tools/v8_gypfiles/libv8_snapshot.a',
+       }],
+-      ['OS=="mac"', {
++      ['OS in ("mac", "ios")', {
+         'clang%': 1,
+         'obj_dir%': '<(PRODUCT_DIR)/obj.target',
+-        'v8_base': '<(PRODUCT_DIR)/libv8_snapshot.a',
++        'use_system_zlib':1,
++      }],
++      ['OS == "android"', {
++        'use_system_zlib':1,
+       }],
+       # V8 pointer compression only supports 64bit architectures.
+       ['target_arch in "arm ia32 mips mipsel ppc"', {
+@@ -124,7 +139,7 @@
+       ['OS == "zos"', {
+         # use ICU data file on z/OS
+         'icu_use_data_file_flag%': 1
+-      }]
++      }],
+     ],
+   },
+ 
+@@ -219,7 +234,7 @@
+             # increase performance, number from experimentation
+             'cflags': [ '-qINLINE=::150:100000' ]
+           }],
+-          ['OS!="mac" and OS!="win" and OS!="zos"', {
++          ['OS!="mac" and OS!="ios" and OS!="win" and OS!="zos"', {
+             # -fno-omit-frame-pointer is necessary for the --perf_basic_prof
+             # flag to work correctly. perf(1) gets confused about JS stack
+             # frames otherwise, even with --call-graph dwarf.
+@@ -346,7 +361,7 @@
+       [ 'target_arch=="arm64"', {
+         'msvs_configuration_platform': 'arm64',
+       }],
+-      ['asan == 1 and OS != "mac" and OS != "zos"', {
++      ['asan == 1 and OS != "mac" and OS!="ios" and OS != "zos"', {
+         'cflags+': [
+           '-fno-omit-frame-pointer',
+           '-fsanitize=address',
+@@ -356,7 +371,7 @@
+         'cflags!': [ '-fomit-frame-pointer' ],
+         'ldflags': [ '-fsanitize=address' ],
+       }],
+-      ['asan == 1 and OS == "mac"', {
++      ['asan == 1 and OS in ("mac","ios")', {
+         'xcode_settings': {
+           'OTHER_CFLAGS+': [
+             '-fno-omit-frame-pointer',
+@@ -548,7 +563,7 @@
+       ['OS=="android"', {
+         'target_conditions': [
+           ['_toolset=="target"', {
+-            'defines': [ '_GLIBCXX_USE_C99_MATH' ],
++            'defines': [ '_GLIBCXX_USE_C99_MATH', 'ANDROID', '__ANDROID__'  ],
+             'libraries': [ '-llog' ],
+           }],
+           ['_toolset=="host"', {
+@@ -557,7 +572,7 @@
+           }],
+         ],
+       }],
+-      ['OS=="mac"', {
++      ['OS in ("mac", "ios")', {
+         'defines': ['_DARWIN_USE_64_BIT_INODE=1'],
+         'xcode_settings': {
+           'ALWAYS_SEARCH_USER_PATHS': 'NO',
+@@ -568,7 +583,6 @@
+           'GCC_ENABLE_CPP_RTTI': 'NO',              # -fno-rtti
+           'GCC_ENABLE_PASCAL_STRINGS': 'NO',        # No -mpascal-strings
+           'PREBINDING': 'NO',                       # No -Wl,-prebind
+-          'MACOSX_DEPLOYMENT_TARGET': '11.0',       # -mmacosx-version-min=11.0
+           'USE_HEADERMAP': 'NO',
+           'OTHER_CFLAGS': [
+             '-fno-strict-aliasing',
+@@ -611,6 +625,32 @@
+               'CLANG_CXX_LIBRARY': 'libc++',
+             },
+           }],
++          ['OS=="mac"', {
++            'xcode_settings':{
++              'MACOSX_DEPLOYMENT_TARGET': '11.0',
++              'SDKROOT':'macosx'
++            },
++          }],
++          ['OS=="ios"', {
++            'xcode_settings':{
++              'IPHONEOS_DEPLOYMENT_TARGET': '13.4',
++              'SDKROOT': '<(ios_sdk)',
++            },
++            'conditions': [
++              ['ios_sdk=="iphoneos"',{
++                'xcode_settings':{
++                  'OTHER_CFLAGS': ['-target <(target_arch)-apple-ios'],
++                  'OTHER_LDFLAGS': ['-target <(target_arch)-apple-ios'],
++                }
++              }],
++              ['ios_sdk=="iphonesimulator"', {
++                'xcode_settings':{
++                  'OTHER_CFLAGS': ['-target <(target_arch)-apple-ios-simulator'],
++                  'OTHER_LDFLAGS': ['-target <(target_arch)-apple-ios-simulator'],
++                }
++              }],
++            ]
++          }],
+         ],
+       }],
+       ['OS=="freebsd"', {
+diff --git a/configure.py b/configure.py
+index 5e014bf7a7..cd092090fa 100755
+--- a/configure.py
++++ b/configure.py
+@@ -55,6 +55,7 @@ valid_mips_arch = ('loongson', 'r1', 'r2', 'r6', 'rx')
+ valid_mips_fpu = ('fp32', 'fp64', 'fpxx')
+ valid_mips_float_abi = ('soft', 'hard')
+ valid_intl_modes = ('none', 'small-icu', 'full-icu', 'system-icu')
++valid_toolset = ('host', 'target')
+ icu_versions = json.loads((tools_path / 'icu' / 'icu_versions.json').read_text(encoding='utf-8'))
+ 
+ shareable_builtins = {'cjs_module_lexer/lexer': 'deps/cjs-module-lexer/lexer.js',
+@@ -128,6 +129,13 @@ parser.add_argument('--dest-os',
+     choices=valid_os,
+     help=f"operating system to build for ({', '.join(valid_os)})")
+ 
++parser.add_argument(
++    "--toolset",
++    dest="toolset",
++    action="store",
++    default=None,
++    help=f"Toolset to be used for build({', '.join(valid_toolset)})")
++
+ parser.add_argument('--error-on-warn',
+     action='store_true',
+     dest='error_on_warn',
+@@ -767,6 +775,18 @@ parser.add_argument('--without-bundled-v8',
+     help='do not use V8 includes from the bundled deps folder. ' +
+          '(This mode is not officially supported for regular applications)')
+ 
++parser.add_argument('--v8-obj-dir',
++    action='store',
++    dest='v8_obj_dir',
++    help='When using --without-bundled-v8, this option specifies the path to the '
++         'V8 library. ')
++
++parser.add_argument('--v8-root-dir',
++    action='store',
++    dest='v8_root_dir',
++    help='When using --without-bundled-v8, this option specifies the path to the '
++         'V8 root dir. ')
++
+ parser.add_argument('--verbose',
+     action='store_true',
+     dest='verbose',
+@@ -1507,6 +1527,13 @@ def configure_v8(o):
+   o['variables']['v8_trace_maps'] = 1 if options.trace_maps else 0
+   o['variables']['node_use_v8_platform'] = b(not options.without_v8_platform)
+   o['variables']['node_use_bundled_v8'] = b(not options.without_bundled_v8)
++  if options.without_bundled_v8:
++    if options.v8_obj_dir and options.v8_root_dir:
++      o['variables']['v8_obj_dir'] = options.v8_obj_dir
++      o['variables']['v8_root_dir'] = options.v8_root_dir
++    else:
++      error('--without-bundled-v8 requires --v8-root-dir and --v8-obj-dir')
++
+   o['variables']['force_dynamic_crt'] = 1 if options.shared else 0
+   o['variables']['node_enable_d8'] = b(options.enable_d8)
+   if options.enable_d8:
+@@ -2144,6 +2171,9 @@ elif flavor == 'win' and sys.platform != 'msys':
+ else:
+   gyp_args += ['-f', 'make-' + flavor]
+ 
++if options.toolset:
++  gyp_args += ['--toolset', options.toolset]
++
+ if options.compile_commands_json:
+   gyp_args += ['-f', 'compile_commands_json']
+   os.path.islink('./compile_commands.json') and os.unlink('./compile_commands.json')
+diff --git a/deps/brotli/brotli.gyp b/deps/brotli/brotli.gyp
+index f82660d82c..3769a54ee9 100644
+--- a/deps/brotli/brotli.gyp
++++ b/deps/brotli/brotli.gyp
+@@ -45,7 +45,7 @@
+       'type': 'static_library',
+       'include_dirs': ['c/include'],
+       'conditions': [
+-        ['OS=="linux"', {
++        ['OS in ("linux", "android")', {
+           'defines': [
+             'OS_LINUX'
+           ]
+@@ -55,7 +55,7 @@
+             'OS_FREEBSD'
+           ]
+         }],
+-        ['OS=="mac"', {
++        ['OS in ("mac","ios")', {
+           'defines': [
+             'OS_MACOSX'
+           ]
+diff --git a/node.gyp b/node.gyp
+index 42e626b2f9..bfed1216d7 100644
+--- a/node.gyp
++++ b/node.gyp
+@@ -28,6 +28,7 @@
+     'node_lib_target_name%': 'libnode',
+     'node_intermediate_lib_type%': 'static_library',
+     'node_builtin_modules_path%': '',
++
+     'linked_module_files': [
+     ],
+     # We list the deps/ files out instead of globbing them in js2c.cc since we
+@@ -40,17 +41,17 @@
+       '<@(linked_module_files)',
+     ],
+     'deps_files': [
+-      'deps/v8/tools/splaytree.mjs',
+-      'deps/v8/tools/codemap.mjs',
+-      'deps/v8/tools/consarray.mjs',
+-      'deps/v8/tools/csvparser.mjs',
+-      'deps/v8/tools/profile.mjs',
+-      'deps/v8/tools/profile_view.mjs',
+-      'deps/v8/tools/logreader.mjs',
+-      'deps/v8/tools/arguments.mjs',
+-      'deps/v8/tools/tickprocessor.mjs',
+-      'deps/v8/tools/sourcemap.mjs',
+-      'deps/v8/tools/tickprocessor-driver.mjs',
++      '<(v8_root_dir)/tools/splaytree.mjs',
++      '<(v8_root_dir)/tools/codemap.mjs',
++      '<(v8_root_dir)/tools/consarray.mjs',
++      '<(v8_root_dir)/tools/csvparser.mjs',
++      '<(v8_root_dir)/tools/profile.mjs',
++      '<(v8_root_dir)/tools/profile_view.mjs',
++      '<(v8_root_dir)/tools/logreader.mjs',
++      '<(v8_root_dir)/tools/arguments.mjs',
++      '<(v8_root_dir)/tools/tickprocessor.mjs',
++      '<(v8_root_dir)/tools/sourcemap.mjs',
++      '<(v8_root_dir)/tools/tickprocessor-driver.mjs',
+       'deps/acorn/acorn/dist/acorn.js',
+       'deps/acorn/acorn-walk/dist/walk.js',
+       'deps/minimatch/index.js',
+@@ -517,7 +518,7 @@
+ 
+       'include_dirs': [
+         'src',
+-        'deps/v8/include',
++        '<(v8_root_dir)/include',
+         'deps/postject'
+       ],
+ 
+@@ -551,6 +552,16 @@
+       'msvs_disabled_warnings!': [4244],
+ 
+       'conditions': [
++        [ 'node_use_bundled_v8=="false"', {
++          'ldflags': ['-Wl,--whole-archive <(v8_base_without_compiler) <(v8_libs)'],
++          'xcode_settings': {
++            'OTHER_LDFLAGS': [
++              '-Wl,-force_load,<(v8_base_without_compiler)',
++              '-lz',
++              '-framework CoreFoundation',
++            ],
++          },
++        }],
+         [ 'error_on_warn=="true"', {
+           'cflags': ['-Werror'],
+           'xcode_settings': {
+@@ -581,14 +592,14 @@
+           'xcode_settings': {
+             'OTHER_LDFLAGS': [
+               '-Wl,-force_load,<(PRODUCT_DIR)/<(STATIC_LIB_PREFIX)<(node_core_target_name)<(STATIC_LIB_SUFFIX)',
+-              '-Wl,-force_load,<(PRODUCT_DIR)/<(STATIC_LIB_PREFIX)v8_base_without_compiler<(STATIC_LIB_SUFFIX)',
++              '-Wl,-force_load,<(v8_base_without_compiler)',
+             ],
+           },
+           'msvs_settings': {
+             'VCLinkerTool': {
+               'AdditionalOptions': [
+                 '/WHOLEARCHIVE:<(node_lib_target_name)<(STATIC_LIB_SUFFIX)',
+-                '/WHOLEARCHIVE:<(STATIC_LIB_PREFIX)v8_base_without_compiler<(STATIC_LIB_SUFFIX)',
++                '/WHOLEARCHIVE:<(v8_base_without_compiler)',
+               ],
+             },
+           },
+@@ -597,7 +608,7 @@
+               'ldflags': [
+                 '-Wl,--whole-archive',
+                 '<(obj_dir)/<(STATIC_LIB_PREFIX)<(node_core_target_name)<(STATIC_LIB_SUFFIX)',
+-                '<(obj_dir)/tools/v8_gypfiles/<(STATIC_LIB_PREFIX)v8_base_without_compiler<(STATIC_LIB_SUFFIX)',
++                '<(v8_base_without_compiler)',
+                 '-Wl,--no-whole-archive',
+               ],
+             }],
+@@ -817,6 +828,7 @@
+       'include_dirs': [
+         'src',
+         'deps/postject',
++        '<(v8_include_dir)',
+         '<(SHARED_INTERMEDIATE_DIR)' # for node_natives.h
+       ],
+       'dependencies': [
+@@ -833,7 +845,7 @@
+       'sources': [
+         '<@(node_sources)',
+         # Dependency headers
+-        'deps/v8/include/v8.h',
++        '<(v8_root_dir)/include/v8.h',
+         'deps/postject/postject-api.h',
+         # javascript files to make for an even more pleasant IDE experience
+         '<@(library_files)',
+@@ -1016,7 +1028,7 @@
+       'include_dirs': [
+         'src',
+         'tools/msvs/genfiles',
+-        'deps/v8/include',
++        '<(v8_root_dir)/include',
+         'deps/cares/include',
+         'deps/uv/include',
+         'deps/uvwasi/include',
+@@ -1068,7 +1080,7 @@
+       'include_dirs': [
+         'src',
+         'tools/msvs/genfiles',
+-        'deps/v8/include',
++        '<(v8_root_dir)/include',
+         'deps/cares/include',
+         'deps/uv/include',
+         'deps/uvwasi/include',
+@@ -1082,8 +1094,17 @@
+       ],
+ 
+       'sources': [ '<@(node_cctest_sources)' ],
+-
+       'conditions': [
++        [ 'node_use_bundled_v8=="false"', {
++          'ldflags': ['-Wl,--whole-archive <(v8_base_without_compiler) <(v8_libs)'],
++          'xcode_settings': {
++            'OTHER_LDFLAGS': [
++              '-Wl,-force_load,<(v8_base_without_compiler)',
++              '-lz',
++              '-framework CoreFoundation',
++            ],
++          },
++        }],
+         [ 'node_use_openssl=="true"', {
+           'defines': [
+             'HAVE_OPENSSL=1',
+@@ -1107,6 +1128,9 @@
+         [ 'OS=="win" and node_shared=="true"', {
+           'type': 'none',
+         }],
++        [ 'OS=="android"', {
++          'type': 'none',
++        }],
+         [ 'node_shared=="true"', {
+           'xcode_settings': {
+             'OTHER_LDFLAGS': [ '-Wl,-rpath,@loader_path', ],
+@@ -1144,7 +1168,7 @@
+       'include_dirs': [
+         'src',
+         'tools/msvs/genfiles',
+-        'deps/v8/include',
++        '<(v8_root_dir)/include',
+         'deps/cares/include',
+         'deps/uv/include',
+         'deps/uvwasi/include',
+@@ -1155,8 +1179,17 @@
+         'src/node_snapshot_stub.cc',
+         'test/embedding/embedtest.cc',
+       ],
+-
+       'conditions': [
++        [ 'node_use_bundled_v8=="false"', {
++          'ldflags': ['-Wl,--whole-archive <(v8_base_without_compiler) <(v8_libs)'],
++          'xcode_settings': {
++            'OTHER_LDFLAGS': [
++              '-Wl,-force_load,<(v8_base_without_compiler)',
++              '-lz',
++              '-framework CoreFoundation',
++            ],
++          },
++        }],
+         ['OS=="solaris"', {
+           'ldflags': [ '-I<(SHARED_INTERMEDIATE_DIR)' ]
+         }],
+@@ -1255,7 +1288,7 @@
+       'include_dirs': [
+         'src',
+         'tools/msvs/genfiles',
+-        'deps/v8/include',
++        '<(v8_root_dir)/include',
+         'deps/cares/include',
+         'deps/uv/include',
+         'deps/uvwasi/include',
+@@ -1268,7 +1301,19 @@
+         'tools/snapshot/node_mksnapshot.cc',
+       ],
+ 
++      'ldflags': ['-Wl,--whole-archive <(v8_base_without_compiler)'],
++
+       'conditions': [
++        [ 'node_use_bundled_v8=="false"', {
++          'ldflags': ['-Wl,--whole-archive <(v8_base_without_compiler) <(v8_libs)'],
++          'xcode_settings': {
++            'OTHER_LDFLAGS': [
++              '-Wl,-force_load,<(v8_base_without_compiler)',
++              '-lz',
++              '-framework CoreFoundation',
++            ],
++          },
++        }],
+         ['node_write_snapshot_as_array_literals=="true"', {
+           'defines': [ 'NODE_MKSNAPSHOT_USE_ARRAY_LITERALS=1' ],
+         }],
+@@ -1317,7 +1362,7 @@
+           'dependencies': ['<(node_lib_target_name)'],
+           'include_dirs': [
+             'src',
+-            'deps/v8/include',
++            '<(v8_root_dir)/include',
+           ],
+           'sources': [
+             '<@(library_files)',
+diff --git a/node.gypi b/node.gypi
+index 95133818df..364b9dffc1 100644
+--- a/node.gypi
++++ b/node.gypi
+@@ -112,11 +112,18 @@
+     }],
+     [ 'v8_enable_i18n_support==1', {
+       'defines': [ 'NODE_HAVE_I18N_SUPPORT=1' ],
+-      'dependencies': [
+-        '<(icu_gyp_path):icui18n',
+-        '<(icu_gyp_path):icuuc',
+-      ],
+       'conditions': [
++        [ 'node_use_bundled_v8=="true"', {
++          'dependencies': [
++            '<(icu_gyp_path):icui18n',
++            '<(icu_gyp_path):icuuc',
++          ],
++        }, {
++          'include_dirs': [
++            '<(v8_root_dir)/third_party/icu/source/common',
++            '<(v8_root_dir)/third_party/icu/source/i18n'
++          ],
++        }],
+         [ 'icu_small=="true"', {
+           'defines': [ 'NODE_HAVE_SMALL_ICU=1' ],
+           'conditions': [
+@@ -139,7 +146,7 @@
+     [ 'node_no_browser_globals=="true"', {
+       'defines': [ 'NODE_NO_BROWSER_GLOBALS' ],
+     } ],
+-    [ 'node_shared_zlib=="false"', {
++    [ 'node_shared_zlib=="false" and node_use_bundled_v8=="true" ', {
+       'dependencies': [ 'deps/zlib/zlib.gyp:zlib' ],
+       'defines': [ 'NODE_BUNDLED_ZLIB' ],
+       'conditions': [
+@@ -292,7 +299,7 @@
+     [ 'node_use_bundled_v8=="true" and v8_postmortem_support==1 and force_load=="true"', {
+       'xcode_settings': {
+         'OTHER_LDFLAGS': [
+-          '-Wl,-force_load,<(v8_base)',
++          '-Wl,-force_load, <(v8_base)',
+         ],
+       },
+     }],
+diff --git a/src/inspector/node_inspector.gypi b/src/inspector/node_inspector.gypi
+index ba24e6acfc..66c585ab32 100644
+--- a/src/inspector/node_inspector.gypi
++++ b/src/inspector/node_inspector.gypi
+@@ -116,7 +116,7 @@
+     {
+       'action_name': 'concatenate_protocols',
+       'inputs': [
+-        '../../deps/v8/include/js_protocol.pdl',
++        '<(v8_include_dir)/js_protocol.pdl',
+         '<(SHARED_INTERMEDIATE_DIR)/src/node_protocol.json',
+       ],
+       'outputs': [

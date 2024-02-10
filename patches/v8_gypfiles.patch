@@ -1,0 +1,108 @@
+diff --git a/tools/v8_gypfiles/d8.gyp b/tools/v8_gypfiles/d8.gyp
+index ba79ebcba7..0b1697da74 100644
+--- a/tools/v8_gypfiles/d8.gyp
++++ b/tools/v8_gypfiles/d8.gyp
+@@ -45,7 +45,7 @@
+             'd8_js2c#host',
+           ],
+         }],
+-        ['(OS=="linux" or OS=="mac" or OS=="freebsd" or OS=="netbsd" \
++        ['(OS=="linux" or OS=="mac" or OS=="ios" or OS=="freebsd" or OS=="netbsd" \
+            or OS=="openbsd" or OS=="solaris" or OS=="android" \
+            or OS=="qnx" or OS=="aix" or OS=="os400")', {
+              'sources': [ '<(V8_ROOT)/src/d8/d8-posix.cc', ]
+diff --git a/tools/v8_gypfiles/toolchain.gypi b/tools/v8_gypfiles/toolchain.gypi
+index cc97adfbc3..c4195286a6 100644
+--- a/tools/v8_gypfiles/toolchain.gypi
++++ b/tools/v8_gypfiles/toolchain.gypi
+@@ -753,7 +753,7 @@
+               'v8_enable_slow_dchecks%': 1,
+             },
+             'conditions': [
+-              ['OS=="linux" or OS=="freebsd" or OS=="openbsd" or OS=="netbsd" or \
++              ['OS=="linux" or OS=="android" or OS=="freebsd" or OS=="openbsd" or OS=="netbsd" or \
+             OS=="qnx" or OS=="aix" or OS=="os400"', {
+                 'cflags!': [
+                   '-O3',
+@@ -766,7 +766,7 @@
+                   '-ffunction-sections',
+                 ],
+               }],
+-              ['OS=="mac"', {
++              ['OS in ("mac", "ios")', {
+                 'xcode_settings': {
+                   'GCC_OPTIMIZATION_LEVEL': '0',  # -O0
+                 },
+@@ -804,7 +804,7 @@
+               'v8_enable_slow_dchecks%': 0,
+             },
+             'conditions': [
+-              ['OS=="linux" or OS=="freebsd" or OS=="openbsd" or OS=="netbsd" or \
++              ['OS=="linux" or OS=="android" or OS=="freebsd" or OS=="openbsd" or OS=="netbsd" or \
+             OS=="qnx" or OS=="aix" or OS=="os400"', {
+                 'cflags!': [
+                   '-O0',
+@@ -827,7 +827,7 @@
+                    }],
+                 ],
+               }],
+-              ['OS=="mac"', {
++              ['OS in ("mac", "ios")', {
+                 'xcode_settings': {
+                   'GCC_OPTIMIZATION_LEVEL': '3',  # -O3
+                   'GCC_STRICT_ALIASING': 'YES',
+@@ -886,7 +886,7 @@
+               '-O2',
+             ],
+           }],
+-          ['OS=="mac"', {
++          ['OS in ("mac", "ios")', {
+             'xcode_settings': {
+               'GCC_OPTIMIZATION_LEVEL': '3',  # -O3
+ 
+diff --git a/tools/v8_gypfiles/v8.gyp b/tools/v8_gypfiles/v8.gyp
+index 4d69a59fcb..3546781401 100644
+--- a/tools/v8_gypfiles/v8.gyp
++++ b/tools/v8_gypfiles/v8.gyp
+@@ -637,12 +637,12 @@
+               }],
+               ['v8_enable_webassembly==1', {
+                 'conditions': [
+-                  ['((_toolset=="host" and host_arch=="arm64" or _toolset=="target" and target_arch=="arm64") and (OS=="linux" or OS=="mac")) or ((_toolset=="host" and host_arch=="x64" or _toolset=="target" and target_arch=="x64") and (OS=="linux" or OS=="mac"))', {
++                  ['((_toolset=="host" and host_arch=="arm64" or _toolset=="target" and target_arch=="arm64") and (OS=="linux" or OS=="mac" or OS=="ios")) or ((_toolset=="host" and host_arch=="x64" or _toolset=="target" and target_arch=="x64") and (OS=="linux" or OS=="mac" or OS=="ios"))', {
+                     'sources': [
+                       '<(V8_ROOT)/src/trap-handler/handler-inside-posix.h',
+                     ],
+                   }],
+-                  ['(_toolset=="host" and host_arch=="x64" or _toolset=="target" and target_arch=="x64") and (OS=="linux" or OS=="mac" or OS=="win")', {
++                  ['(_toolset=="host" and host_arch=="x64" or _toolset=="target" and target_arch=="x64") and (OS=="linux" or OS=="mac" or OS=="ios" or OS=="win")', {
+                     'sources': [
+                       '<(V8_ROOT)/src/trap-handler/trap-handler-simulator.h',
+                     ],
+@@ -969,7 +969,7 @@
+           'conditions': [
+             ['v8_enable_webassembly==1', {
+               'conditions': [
+-                ['((_toolset=="host" and host_arch=="arm64" or _toolset=="target" and target_arch=="arm64") and (OS=="linux" or OS=="mac" or OS=="ios")) or ((_toolset=="host" and host_arch=="x64" or _toolset=="target" and target_arch=="x64") and (OS=="linux" or OS=="mac"))', {
++                ['((_toolset=="host" and host_arch=="arm64" or _toolset=="target" and target_arch=="arm64") and (OS=="linux" or OS=="mac" or OS=="ios")) or ((_toolset=="host" and host_arch=="x64" or _toolset=="target" and target_arch=="x64") and (OS=="linux" or OS=="mac" or OS=="ios"))', {
+                   'sources': [
+                     '<(V8_ROOT)/src/trap-handler/handler-inside-posix.cc',
+                     '<(V8_ROOT)/src/trap-handler/handler-outside-posix.cc',
+@@ -981,7 +981,7 @@
+                     '<(V8_ROOT)/src/trap-handler/handler-outside-win.cc',
+                   ],
+                 }],
+-                ['(_toolset=="host" and host_arch=="x64" or _toolset=="target" and target_arch=="x64") and (OS=="linux" or OS=="mac" or OS=="win")', {
++                ['(_toolset=="host" and host_arch=="x64" or _toolset=="target" and target_arch=="x64") and (OS=="linux" or OS=="mac" or OS=="ios" or OS=="win")', {
+                   'sources': [
+                     '<(V8_ROOT)/src/trap-handler/handler-outside-simulator.cc',
+                   ],
+@@ -1479,7 +1479,7 @@
+             '<(V8_ROOT)/src/libplatform/tracing/recorder-win.cc',
+           ],
+         }],
+-        ['v8_enable_system_instrumentation==1 and OS=="mac"', {
++        ['v8_enable_system_instrumentation==1 and (OS=="mac" or OS=="ios")', {
+           'sources': [
+             '<(V8_ROOT)/src/libplatform/tracing/recorder.h',
+             '<(V8_ROOT)/src/libplatform/tracing/recorder-mac.cc',

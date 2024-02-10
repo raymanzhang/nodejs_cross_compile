@@ -1,0 +1,84 @@
+diff --git a/src/node_platform.cc b/src/node_platform.cc
+index 97cf6cb840..03880c5817 100644
+--- a/src/node_platform.cc
++++ b/src/node_platform.cc
+@@ -501,14 +501,21 @@ bool PerIsolatePlatformData::FlushForegroundTasksInternal() {
+   return did_work;
+ }
+ 
+-void NodePlatform::CallOnWorkerThread(std::unique_ptr<Task> task) {
+-  worker_thread_task_runner_->PostTask(std::move(task));
+-}
+-
+-void NodePlatform::CallDelayedOnWorkerThread(std::unique_ptr<Task> task,
+-                                             double delay_in_seconds) {
+-  worker_thread_task_runner_->PostDelayedTask(std::move(task),
++void NodePlatform::PostTaskOnWorkerThreadImpl(
++                    v8::TaskPriority priority,
++                    std::unique_ptr<v8::Task> task,
++                    const v8::SourceLocation& location){
++  if (priority==v8::TaskPriority::kUserVisible)
++    worker_thread_task_runner_->PostTask(std::move(task));
++}
++
++void NodePlatform::PostDelayedTaskOnWorkerThreadImpl(
++                    v8::TaskPriority priority, std::unique_ptr<v8::Task> task,
++                    double delay_in_seconds, const v8::SourceLocation& location){
++  if (priority==v8::TaskPriority::kUserBlocking) {
++    worker_thread_task_runner_->PostDelayedTask(std::move(task),
+                                               delay_in_seconds);
++  }
+ }
+ 
+ 
+@@ -533,8 +540,9 @@ bool NodePlatform::FlushForegroundTasks(Isolate* isolate) {
+   return per_isolate->FlushForegroundTasksInternal();
+ }
+ 
+-std::unique_ptr<v8::JobHandle> NodePlatform::CreateJob(
+-    v8::TaskPriority priority, std::unique_ptr<v8::JobTask> job_task) {
++std::unique_ptr<v8::JobHandle> NodePlatform::CreateJobImpl(
++      v8::TaskPriority priority, std::unique_ptr<v8::JobTask> job_task,
++      const v8::SourceLocation& location) {
+   return v8::platform::NewDefaultJobHandle(
+       this, priority, std::move(job_task), NumberOfWorkerThreads());
+ }
+diff --git a/src/node_platform.h b/src/node_platform.h
+index 1062f3b1b9..7cd5d4d5d7 100644
+--- a/src/node_platform.h
++++ b/src/node_platform.h
+@@ -147,17 +147,28 @@ class NodePlatform : public MultiIsolatePlatform {
+ 
+   // v8::Platform implementation.
+   int NumberOfWorkerThreads() override;
+-  void CallOnWorkerThread(std::unique_ptr<v8::Task> task) override;
+-  void CallDelayedOnWorkerThread(std::unique_ptr<v8::Task> task,
+-                                 double delay_in_seconds) override;
++  void PostTaskOnWorkerThreadImpl(v8::TaskPriority priority,
++                                          std::unique_ptr<v8::Task> task,
++                                          const v8::SourceLocation& location) override;
++  void PostDelayedTaskOnWorkerThreadImpl(
++      v8::TaskPriority priority, std::unique_ptr<v8::Task> task,
++      double delay_in_seconds, const v8::SourceLocation& location) override;
++
++  // void CallOnWorkerThread(std::unique_ptr<v8::Task> task) override;
++  // void CallDelayedOnWorkerThread(std::unique_ptr<v8::Task> task,
++  //                                  double delay_in_seconds) override;
+   bool IdleTasksEnabled(v8::Isolate* isolate) override;
+   double MonotonicallyIncreasingTime() override;
+   double CurrentClockTimeMillis() override;
+   v8::TracingController* GetTracingController() override;
+   bool FlushForegroundTasks(v8::Isolate* isolate) override;
+-  std::unique_ptr<v8::JobHandle> CreateJob(
+-      v8::TaskPriority priority,
+-      std::unique_ptr<v8::JobTask> job_task) override;
++  std::unique_ptr<v8::JobHandle> CreateJobImpl(
++      v8::TaskPriority priority, std::unique_ptr<v8::JobTask> job_task,
++      const v8::SourceLocation& location) override;
++
++  // std::unique_ptr<v8::JobHandle> CreateJob(
++  //     v8::TaskPriority priority,
++  //     std::unique_ptr<v8::JobTask> job_task) override;
+ 
+   void RegisterIsolate(v8::Isolate* isolate, uv_loop_t* loop) override;
+   void RegisterIsolate(v8::Isolate* isolate,
