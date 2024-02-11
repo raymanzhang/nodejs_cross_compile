@@ -1,8 +1,8 @@
 diff --git a/common.gypi b/common.gypi
-index b8c5cf1da7..d88828df65 100644
+index b8c5cf1da7..f22759c8b4 100644
 --- a/common.gypi
 +++ b/common.gypi
-@@ -88,27 +88,42 @@
+@@ -88,27 +88,39 @@
  
      ##### end V8 defaults #####
  
@@ -11,16 +11,13 @@ index b8c5cf1da7..d88828df65 100644
 +    'v8_include_dir': '<(v8_root_dir)/include',
 +    'obj_dir': '<(PRODUCT_DIR)/obj.target',
 +    'v8_obj_dir': '<(obj_dir)/tools/v8_gypfiles',
-+    'v8_libs': '',
-+    'v8_base': '<(v8_obj_dir)/libv8_snapshot.a',
-+    'v8_base_without_compiler': '<(v8_obj_dir)/<(STATIC_LIB_PREFIX)v8_base_without_compiler<(STATIC_LIB_SUFFIX)',
-+#    'v8_base_without_compiler%': '<(v8_obj_dir)/libv8_base_without_compiler.a <(v8_obj_dir)/libv8_libplatform.a <(v8_obj_dir)/libv8_libbase.a <(v8_obj_dir)/libcppgc_base.a <(v8_obj_dir)/libtorque_generated_definitions.a <(v8_obj_dir)/libv8_heap_base.a <(v8_obj_dir)/libv8_bigint.a',
-+#    'v8_base_without_compiler%': '<(v8_obj_dir)/libv8_monolith.a',
      'conditions': [
-+      ['node_use_bundled_v8==0', {
-+        # 'v8_libs': '<(v8_obj_dir)/libv8_monolith.a',
-+        'v8_base': '<(v8_libs)',
-+        'v8_base_without_compiler': '<(v8_obj_dir)/libv8_monolith.a',
++      ['node_use_bundled_v8=="false"', {
++        'v8_base%': '',
++        'v8_base_without_compiler%': '<(v8_obj_dir)/libv8_monolith.a',
++      },{
++        'v8_base%': '<(v8_obj_dir)/libv8_snapshot.a',
++        'v8_base_without_compiler%': '<(v8_obj_dir)/<(STATIC_LIB_PREFIX)v8_base_without_compiler<(STATIC_LIB_SUFFIX)',
 +      }],
        ['OS == "win"', {
          'os_posix': 0,
@@ -52,7 +49,7 @@ index b8c5cf1da7..d88828df65 100644
        }],
        # V8 pointer compression only supports 64bit architectures.
        ['target_arch in "arm ia32 mips mipsel ppc"', {
-@@ -124,7 +139,7 @@
+@@ -124,7 +136,7 @@
        ['OS == "zos"', {
          # use ICU data file on z/OS
          'icu_use_data_file_flag%': 1
@@ -61,7 +58,7 @@ index b8c5cf1da7..d88828df65 100644
      ],
    },
  
-@@ -219,7 +234,7 @@
+@@ -219,7 +231,7 @@
              # increase performance, number from experimentation
              'cflags': [ '-qINLINE=::150:100000' ]
            }],
@@ -70,7 +67,7 @@ index b8c5cf1da7..d88828df65 100644
              # -fno-omit-frame-pointer is necessary for the --perf_basic_prof
              # flag to work correctly. perf(1) gets confused about JS stack
              # frames otherwise, even with --call-graph dwarf.
-@@ -346,7 +361,7 @@
+@@ -346,7 +358,7 @@
        [ 'target_arch=="arm64"', {
          'msvs_configuration_platform': 'arm64',
        }],
@@ -79,7 +76,7 @@ index b8c5cf1da7..d88828df65 100644
          'cflags+': [
            '-fno-omit-frame-pointer',
            '-fsanitize=address',
-@@ -356,7 +371,7 @@
+@@ -356,7 +368,7 @@
          'cflags!': [ '-fomit-frame-pointer' ],
          'ldflags': [ '-fsanitize=address' ],
        }],
@@ -88,16 +85,18 @@ index b8c5cf1da7..d88828df65 100644
          'xcode_settings': {
            'OTHER_CFLAGS+': [
              '-fno-omit-frame-pointer',
-@@ -548,7 +563,7 @@
+@@ -548,8 +560,8 @@
        ['OS=="android"', {
          'target_conditions': [
            ['_toolset=="target"', {
 -            'defines': [ '_GLIBCXX_USE_C99_MATH' ],
+-            'libraries': [ '-llog' ],
 +            'defines': [ '_GLIBCXX_USE_C99_MATH', 'ANDROID', '__ANDROID__'  ],
-             'libraries': [ '-llog' ],
++            'libraries': [ '-llog', '-lz' ],
            }],
            ['_toolset=="host"', {
-@@ -557,7 +572,7 @@
+             'cflags': [ '-pthread' ],
+@@ -557,7 +569,7 @@
            }],
          ],
        }],
@@ -106,7 +105,7 @@ index b8c5cf1da7..d88828df65 100644
          'defines': ['_DARWIN_USE_64_BIT_INODE=1'],
          'xcode_settings': {
            'ALWAYS_SEARCH_USER_PATHS': 'NO',
-@@ -568,7 +583,6 @@
+@@ -568,7 +580,6 @@
            'GCC_ENABLE_CPP_RTTI': 'NO',              # -fno-rtti
            'GCC_ENABLE_PASCAL_STRINGS': 'NO',        # No -mpascal-strings
            'PREBINDING': 'NO',                       # No -Wl,-prebind
@@ -114,6 +113,16 @@ index b8c5cf1da7..d88828df65 100644
            'USE_HEADERMAP': 'NO',
            'OTHER_CFLAGS': [
              '-fno-strict-aliasing',
+@@ -579,6 +590,9 @@
+             '-W',
+             '-Wno-unused-parameter',
+           ],
++          'OTHER_LDFLAGS': [
++            '-lz'
++          ],
+         },
+         'target_conditions': [
+           ['_type!="static_library"', {
 @@ -611,6 +625,32 @@
                'CLANG_CXX_LIBRARY': 'libc++',
              },
@@ -239,7 +248,7 @@ index f82660d82c..3769a54ee9 100644
              'OS_MACOSX'
            ]
 diff --git a/node.gyp b/node.gyp
-index 42e626b2f9..bfed1216d7 100644
+index 42e626b2f9..508ba95432 100644
 --- a/node.gyp
 +++ b/node.gyp
 @@ -28,6 +28,7 @@
@@ -288,24 +297,7 @@ index 42e626b2f9..bfed1216d7 100644
          'deps/postject'
        ],
  
-@@ -551,6 +552,16 @@
-       'msvs_disabled_warnings!': [4244],
- 
-       'conditions': [
-+        [ 'node_use_bundled_v8=="false"', {
-+          'ldflags': ['-Wl,--whole-archive <(v8_base_without_compiler) <(v8_libs)'],
-+          'xcode_settings': {
-+            'OTHER_LDFLAGS': [
-+              '-Wl,-force_load,<(v8_base_without_compiler)',
-+              '-lz',
-+              '-framework CoreFoundation',
-+            ],
-+          },
-+        }],
-         [ 'error_on_warn=="true"', {
-           'cflags': ['-Werror'],
-           'xcode_settings': {
-@@ -581,14 +592,14 @@
+@@ -581,14 +582,14 @@
            'xcode_settings': {
              'OTHER_LDFLAGS': [
                '-Wl,-force_load,<(PRODUCT_DIR)/<(STATIC_LIB_PREFIX)<(node_core_target_name)<(STATIC_LIB_SUFFIX)',
@@ -322,7 +314,7 @@ index 42e626b2f9..bfed1216d7 100644
                ],
              },
            },
-@@ -597,7 +608,7 @@
+@@ -597,7 +598,7 @@
                'ldflags': [
                  '-Wl,--whole-archive',
                  '<(obj_dir)/<(STATIC_LIB_PREFIX)<(node_core_target_name)<(STATIC_LIB_SUFFIX)',
@@ -331,7 +323,7 @@ index 42e626b2f9..bfed1216d7 100644
                  '-Wl,--no-whole-archive',
                ],
              }],
-@@ -817,6 +828,7 @@
+@@ -817,6 +818,7 @@
        'include_dirs': [
          'src',
          'deps/postject',
@@ -339,7 +331,7 @@ index 42e626b2f9..bfed1216d7 100644
          '<(SHARED_INTERMEDIATE_DIR)' # for node_natives.h
        ],
        'dependencies': [
-@@ -833,7 +845,7 @@
+@@ -833,7 +835,7 @@
        'sources': [
          '<@(node_sources)',
          # Dependency headers
@@ -348,7 +340,7 @@ index 42e626b2f9..bfed1216d7 100644
          'deps/postject/postject-api.h',
          # javascript files to make for an even more pleasant IDE experience
          '<@(library_files)',
-@@ -1016,7 +1028,7 @@
+@@ -1016,7 +1018,7 @@
        'include_dirs': [
          'src',
          'tools/msvs/genfiles',
@@ -357,7 +349,7 @@ index 42e626b2f9..bfed1216d7 100644
          'deps/cares/include',
          'deps/uv/include',
          'deps/uvwasi/include',
-@@ -1068,7 +1080,7 @@
+@@ -1068,7 +1070,7 @@
        'include_dirs': [
          'src',
          'tools/msvs/genfiles',
@@ -366,26 +358,15 @@ index 42e626b2f9..bfed1216d7 100644
          'deps/cares/include',
          'deps/uv/include',
          'deps/uvwasi/include',
-@@ -1082,8 +1094,17 @@
+@@ -1082,7 +1084,6 @@
        ],
  
        'sources': [ '<@(node_cctest_sources)' ],
 -
        'conditions': [
-+        [ 'node_use_bundled_v8=="false"', {
-+          'ldflags': ['-Wl,--whole-archive <(v8_base_without_compiler) <(v8_libs)'],
-+          'xcode_settings': {
-+            'OTHER_LDFLAGS': [
-+              '-Wl,-force_load,<(v8_base_without_compiler)',
-+              '-lz',
-+              '-framework CoreFoundation',
-+            ],
-+          },
-+        }],
          [ 'node_use_openssl=="true"', {
            'defines': [
-             'HAVE_OPENSSL=1',
-@@ -1107,6 +1128,9 @@
+@@ -1107,6 +1108,9 @@
          [ 'OS=="win" and node_shared=="true"', {
            'type': 'none',
          }],
@@ -395,7 +376,7 @@ index 42e626b2f9..bfed1216d7 100644
          [ 'node_shared=="true"', {
            'xcode_settings': {
              'OTHER_LDFLAGS': [ '-Wl,-rpath,@loader_path', ],
-@@ -1144,7 +1168,7 @@
+@@ -1144,7 +1148,7 @@
        'include_dirs': [
          'src',
          'tools/msvs/genfiles',
@@ -404,18 +385,17 @@ index 42e626b2f9..bfed1216d7 100644
          'deps/cares/include',
          'deps/uv/include',
          'deps/uvwasi/include',
-@@ -1155,8 +1179,17 @@
+@@ -1155,8 +1159,16 @@
          'src/node_snapshot_stub.cc',
          'test/embedding/embedtest.cc',
        ],
 -
        'conditions': [
 +        [ 'node_use_bundled_v8=="false"', {
-+          'ldflags': ['-Wl,--whole-archive <(v8_base_without_compiler) <(v8_libs)'],
++          'ldflags': ['-Wl,--whole-archive <(v8_base_without_compiler)'],
 +          'xcode_settings': {
 +            'OTHER_LDFLAGS': [
 +              '-Wl,-force_load,<(v8_base_without_compiler)',
-+              '-lz',
 +              '-framework CoreFoundation',
 +            ],
 +          },
@@ -423,7 +403,7 @@ index 42e626b2f9..bfed1216d7 100644
          ['OS=="solaris"', {
            'ldflags': [ '-I<(SHARED_INTERMEDIATE_DIR)' ]
          }],
-@@ -1255,7 +1288,7 @@
+@@ -1255,7 +1267,7 @@
        'include_dirs': [
          'src',
          'tools/msvs/genfiles',
@@ -432,19 +412,15 @@ index 42e626b2f9..bfed1216d7 100644
          'deps/cares/include',
          'deps/uv/include',
          'deps/uvwasi/include',
-@@ -1268,7 +1301,19 @@
-         'tools/snapshot/node_mksnapshot.cc',
+@@ -1269,6 +1281,15 @@
        ],
  
-+      'ldflags': ['-Wl,--whole-archive <(v8_base_without_compiler)'],
-+
        'conditions': [
 +        [ 'node_use_bundled_v8=="false"', {
-+          'ldflags': ['-Wl,--whole-archive <(v8_base_without_compiler) <(v8_libs)'],
++          'ldflags': ['-Wl,--whole-archive <(v8_base_without_compiler)'],
 +          'xcode_settings': {
 +            'OTHER_LDFLAGS': [
 +              '-Wl,-force_load,<(v8_base_without_compiler)',
-+              '-lz',
 +              '-framework CoreFoundation',
 +            ],
 +          },
@@ -452,7 +428,7 @@ index 42e626b2f9..bfed1216d7 100644
          ['node_write_snapshot_as_array_literals=="true"', {
            'defines': [ 'NODE_MKSNAPSHOT_USE_ARRAY_LITERALS=1' ],
          }],
-@@ -1317,7 +1362,7 @@
+@@ -1317,7 +1338,7 @@
            'dependencies': ['<(node_lib_target_name)'],
            'include_dirs': [
              'src',
